@@ -11,4 +11,5 @@ public interface IMovieService
 
     // TODO(candidate): add a search method here (query + page) and implement it on
     // MovieService by calling ITmdbClient's new search method.
+    Task<MoviePage> SearchMoviesAsync(string query, int page, CancellationToken cancellationToken);
 }

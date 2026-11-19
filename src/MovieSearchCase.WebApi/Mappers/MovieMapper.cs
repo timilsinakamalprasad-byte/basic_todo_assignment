@@ -12,4 +12,12 @@ internal static class MovieMapper
         VoteAverage = movie.VoteAverage,
         ReleaseDate = movie.ReleaseDate,
     };
+
+    public static Models.Movies.MoviePage ToApiModel(this Domain.Entities.MoviePage page) => new()
+    {
+        Page = page.Page,
+        TotalPages = page.TotalPages,
+        TotalResults = page.TotalResults,
+        Results = page.Results.Select(ToApiModel).ToList(),
+    };
 }

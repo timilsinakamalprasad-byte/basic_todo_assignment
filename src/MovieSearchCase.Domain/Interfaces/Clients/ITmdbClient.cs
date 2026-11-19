@@ -14,4 +14,13 @@ public interface ITmdbClient
 
     // TODO(candidate): add a method here for TMDB's /search/movie endpoint (query + page)
     // and implement it on TmdbClient, following the same pattern as GetTrendingMoviesAsync.
+
+    /// <summary>
+    /// Searches for movies by query and page (TMDB's /search/movie endpoint).
+    /// @param query The search query string.
+    /// @param page The page number of results to return.
+    /// @param cancellationToken The cancellation token.
+    /// @returns A MoviePage containing the search results.
+    /// </summary>
+    Task<MoviePage> SearchMoviesAsync(string query, int page, CancellationToken cancellationToken);
 }

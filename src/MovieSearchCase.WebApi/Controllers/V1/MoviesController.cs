@@ -30,4 +30,11 @@ public class MoviesController : ApiControllerBase
     // following the same one-liner pattern as GetTrending — resolve a handler from the
     // factory and call HandleAsync(Request). See Handlers/Movies/GetTrendingMoviesHandler.cs
     // for what the handler itself should look like.
+    [HttpGet("search")]
+    [SwaggerOperation(Summary = "Search movies", OperationId = "SearchMovies")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Matching movies with pagination", typeof(Models.Movies.MoviePage))]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid query or page parameter")]
+    [SwaggerResponse(StatusCodes.Status503ServiceUnavailable, "TMDB unavailable")]
+    public async Task<IActionResult> Search([AsParameters] Models.Movies.SearchMoviesRequest request) =>
+        await _requestHandlerFactory.SearchMovies(request).HandleAsync(Request);
 }
