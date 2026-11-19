@@ -45,6 +45,31 @@ public class TmdbMovie
     [JsonPropertyName("release_date")]
     public string? ReleaseDate { get; init; }
 }
+
+public class TmdbTvSeries
+{
+    [JsonPropertyName("id")]
+    public int Id { get; init; }
+
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+
+    [JsonPropertyName("overview")]
+    public string? Overview { get; init; }
+
+    [JsonPropertyName("poster_path")]
+    public string? PosterPath { get; init; }
+
+    [JsonPropertyName("backdrop_path")]
+    public string? BackdropPath { get; init; }
+
+    [JsonPropertyName("vote_average")]
+    public double VoteAverage { get; init; }
+
+    [JsonPropertyName("first_air_date")]
+    public string? FirstAirDate { get; init; }
+}
+
 /// Represents detailed information about a movie, including additional fields
 /// such as runtime, tagline, and genres.
 public class TmdbMovieDetails : TmdbMovie

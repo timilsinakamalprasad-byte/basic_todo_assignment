@@ -121,6 +121,90 @@ public class TmdbClientTests
     }
 
     [Fact]
+    public async Task SearchTvAsyncShouldEscapeQueryAndMapResponse()
+    {
+        const string json = """
+            {
+              "page": 2,
+              "results": [
+                {
+                  "id": 42,
+                  "name": "The Answer",
+                  "overview": "A series about the answer.",
+                  "poster_path": "/poster.jpg",
+                  "backdrop_path": "/backdrop.jpg",
+                  "vote_average": 8.3,
+                  "first_air_date": "2024-01-15"
+                }
+              ],
+              "total_pages": 4,
+              "total_results": 72
+            }
+            """;
+        var stub = new StubHttpMessageHandler(json);
+        using var httpClient = new HttpClient(stub)
+        {
+            BaseAddress = new Uri("https://api.themoviedb.org/3/"),
+        };
+        var client = new TmdbClient(httpClient);
+
+        var result = await client.SearchTvAsync("The & Answer", 2, CancellationToken.None);
+
+        stub.RequestUri.Should().Be(
+            "https://api.themoviedb.org/3/search/tv?query=The %26 Answer&page=2");
+        result.Page.Should().Be(2);
+        result.TotalPages.Should().Be(4);
+        result.TotalResults.Should().Be(72);
+        result.Results.Should().ContainSingle(series =>
+            series.Id == 42 &&
+            series.Name == "The Answer" &&
+            series.Overview == "A series about the answer." &&
+            series.FirstAirDate == new DateOnly(2024, 1, 15));
+    }
+
+    [Fact]
+    public async Task SearchTvAsyncShouldReturnZeroPaginationWhenResultsAreEmpty()
+    {
+        const string json = """
+            {
+              "page": 1,
+              "results": [],
+              "total_pages": 1,
+              "total_results": 0
+            }
+            """;
+        using var httpClient = new HttpClient(new StubHttpMessageHandler(json))
+        {
+            BaseAddress = new Uri("https://api.themoviedb.org/3/"),
+        };
+        var client = new TmdbClient(httpClient);
+
+        var result = await client.SearchTvAsync("unknown", 1, CancellationToken.None);
+
+        result.Page.Should().Be(0);
+        result.TotalPages.Should().Be(0);
+        result.TotalResults.Should().Be(0);
+        result.Results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SearchTvAsyncShouldTranslateRequestFailure()
+    {
+        using var httpClient = new HttpClient(
+            new StubHttpMessageHandler(exception: new HttpRequestException("TMDB unavailable")))
+        {
+            BaseAddress = new Uri("https://api.themoviedb.org/3/"),
+        };
+        var client = new TmdbClient(httpClient);
+
+        var action = () => client.SearchTvAsync("The Answer", 1, CancellationToken.None);
+
+        var exception = await action.Should().ThrowAsync<MovieException>();
+        exception.Which.ErrorCode.Should().Be(ErrorType.UpstreamServiceUnavailable);
+        exception.Which.Details.Should().Be("TMDB did not return TV search results.");
+    }
+
+    [Fact]
     public async Task GetMovieDetailsAsyncShouldMapMovieAndDetailsFields()
     {
         const string json = """

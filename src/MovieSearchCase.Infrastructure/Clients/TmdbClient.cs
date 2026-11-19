@@ -85,6 +85,42 @@ public class TmdbClient : ITmdbClient
         };
     }
 
+    public async Task<TvSeriesPage> SearchTvAsync(string query, int page, CancellationToken cancellationToken)
+    {
+        TmdbPagedResponse<TmdbTvSeries>? response;
+
+        try
+        {
+            response = await _httpClient.GetFromJsonAsync<TmdbPagedResponse<TmdbTvSeries>>(
+                $"search/tv?query={Uri.EscapeDataString(query)}&page={page}",
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            throw new MovieException(
+                MovieException.ExceptionTitle,
+                ErrorType.UpstreamServiceUnavailable,
+                "TMDB did not return TV search results.");
+        }
+
+        if (response is null)
+        {
+            throw new MovieException(
+                MovieException.ExceptionTitle,
+                ErrorType.UpstreamServiceUnavailable,
+                "TMDB returned an empty TV search results response.");
+        }
+
+        var hasResults = response.Results.Count > 0;
+        return new TvSeriesPage
+        {
+            Page = hasResults ? response.Page : 0,
+            TotalPages = hasResults ? response.TotalPages : 0,
+            TotalResults = hasResults ? response.TotalResults : 0,
+            Results = response.Results.Select(TmdbMovieMapper.ToDomainModel).ToList(),
+        };
+    }
+
     // TODO(candidate): implement TMDB's /movie/{movie_id} endpoint here, following the same try/catch + mapping pattern as GetTrendingMoviesAsync above.
     // See https://developer.themoviedb.org/reference/movie-details for details on the endpoint.
     public async Task<MovieDetails> GetMovieDetailsAsync(int id, CancellationToken cancellationToken)

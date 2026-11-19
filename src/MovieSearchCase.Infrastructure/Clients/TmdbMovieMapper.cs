@@ -22,6 +22,25 @@ internal static class TmdbMovieMapper
             ? releaseDate
             : null,
     };
+
+    public static TvSeries ToDomainModel(this TmdbTvSeries tmdbTvSeries) => new()
+    {
+        Id = tmdbTvSeries.Id,
+        Name = tmdbTvSeries.Name,
+        Overview = tmdbTvSeries.Overview,
+        PosterPath = tmdbTvSeries.PosterPath,
+        BackdropPath = tmdbTvSeries.BackdropPath,
+        VoteAverage = tmdbTvSeries.VoteAverage,
+        FirstAirDate = DateOnly.TryParseExact(
+            tmdbTvSeries.FirstAirDate,
+            "yyyy-MM-dd",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out var firstAirDate)
+            ? firstAirDate
+            : null,
+    };
+
     // add a ToDetailsDomainModel method here that maps TmdbMovieDetails to MovieDetails.
     public static MovieDetails ToDetailsDomainModel(this TmdbMovieDetails tmdbMovie) => new()
     {

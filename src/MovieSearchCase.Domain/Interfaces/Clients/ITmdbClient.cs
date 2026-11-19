@@ -24,6 +24,8 @@ public interface ITmdbClient
     /// </summary>
     Task<MoviePage> SearchMoviesAsync(string query, int page, CancellationToken cancellationToken);
 
+    Task<TvSeriesPage> SearchTvAsync(string query, int page, CancellationToken cancellationToken);
+
     /// <summary>
     /// Gets the details of a movie by its TMDB ID (TMDB's /movie/{movie_id} endpoint).
     /// @param id The TMDB movie ID.

@@ -9,7 +9,7 @@ The API is a .NET 10 layered project:
 - `src/MovieSearchCase.Shared`
 - `src/MovieSearchCase.WebApi`
 
-It calls [The Movie Database (TMDB)](https://www.themoviedb.org/). Today it serves this week's trending movies.
+It calls [The Movie Database (TMDB)](https://www.themoviedb.org/). It serves trending movies, movie search and details, movie videos, and TV series search.
 
 A separate frontend developer builds the UI against the [API contract](#api-contract) below, using a mock API.
 Your API must follow the same contract, so the frontend works with it without any changes.
@@ -40,9 +40,10 @@ Your API must follow the same contract, so the frontend works with it without an
   TMDB exposes trailer video keys through [`GET /movie/{id}/videos`](https://developer.themoviedb.org/reference/movie-videos).
   The same TMDB token covers it.
 
-### P3: stretch
+### P3: TV series search
 
-- TV/series search next to movies (TMDB has a parallel `/tv` namespace).
+- **TV series search**: `GET /api/v1/tv/search?query=&page=`.
+  It proxies TMDB's `/search/tv` endpoint.
 - Caching or performance work on search.
 
 ### Guidelines
@@ -111,6 +112,25 @@ Response `200 OK`:
 
 When nothing matches, the response is still `200 OK`.
 It has `"totalPages": 0`, `"totalResults": 0` and `"results": []`.
+
+### `GET /tv/search?query={query}&page={page}` (P3)
+
+Uses the same query and page validation and pagination response shape as movie search.
+Each result is a TV series:
+
+```json
+{
+  "id": 1399,
+  "name": "Game of Thrones",
+  "overview": "…",
+  "posterPath": "…",
+  "backdropPath": "…",
+  "voteAverage": 8.4,
+  "firstAirDate": "2011-04-17"
+}
+```
+
+`overview`, `posterPath`, `backdropPath` and `firstAirDate` can be `null`.
 
 ### `GET /movies/{id}` (P2)
 
