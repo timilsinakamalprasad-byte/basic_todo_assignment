@@ -227,3 +227,14 @@ Include a short note on:
 
 - What you prioritized and what you skipped, and why.
 - Any part of the contract you found unclear or would change, and why.
+
+For architecture, project structure, validation, and caching details, see the [Technical Docs](docs/technical-docs.md).
+
+## Completed work
+
+- Added movie search with pagination and query/page validation.
+- Added movie details and movie video endpoints; video results are filtered to YouTube.
+- Added paginated TV-series search with query/page validation.
+- Added Problem Details error responses using `application/problem+json`.
+- Added reusable HybridCache support for TV search, with configurable expiration and Redis or in-memory distributed cache selection.
+- Added tests for API handlers, services, TMDB client behavior, and caching.
