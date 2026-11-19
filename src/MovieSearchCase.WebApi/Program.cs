@@ -16,7 +16,7 @@ builder.Services
     .AddCustomSwagger()
     .AddCorsDefaultPolicy(builder.Configuration)
     .AddSupportToApiVersioning()
-    .AddServices()
+    .AddServices(builder.Configuration)
     .AddClients(builder.Configuration)
     .AddRequestHandlerFactories();
 

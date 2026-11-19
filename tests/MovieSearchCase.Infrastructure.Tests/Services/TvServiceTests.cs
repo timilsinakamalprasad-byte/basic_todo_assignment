@@ -1,7 +1,11 @@
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using MovieSearchCase.Domain.Entities;
 using MovieSearchCase.Domain.Interfaces.Clients;
+using MovieSearchCase.Infrastructure.Cache;
 using MovieSearchCase.Infrastructure.Services;
 using Xunit;
 
@@ -30,15 +34,29 @@ public class TvServiceTests
         using var cancellationSource = new CancellationTokenSource();
         var tmdbClientMock = new Mock<ITmdbClient>();
         tmdbClientMock
-            .Setup(client => client.SearchTvAsync("The Answer", 2, cancellationSource.Token))
+            .Setup(client => client.SearchTvAsync(
+                "The Answer",
+                2,
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedPage);
-        var tvService = new TvService(tmdbClientMock.Object);
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddHybridCache();
+        using var serviceProvider = services.BuildServiceProvider();
+        var tvService = new TvService(
+            tmdbClientMock.Object,
+            new HybridCaching(serviceProvider.GetRequiredService<HybridCache>()));
 
         var result = await tvService.SearchTvAsync("The Answer", 2, cancellationSource.Token);
+        var cachedResult = await tvService.SearchTvAsync("The Answer", 2, cancellationSource.Token);
 
-        result.Should().BeSameAs(expectedPage);
+        result.Should().BeEquivalentTo(expectedPage);
+        cachedResult.Should().BeEquivalentTo(expectedPage);
         tmdbClientMock.Verify(
-            client => client.SearchTvAsync("The Answer", 2, cancellationSource.Token),
+            client => client.SearchTvAsync(
+                "The Answer",
+                2,
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 }

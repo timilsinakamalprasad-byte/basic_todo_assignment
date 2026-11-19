@@ -116,6 +116,8 @@ It has `"totalPages": 0`, `"totalResults": 0` and `"results": []`.
 ### `GET /tv/search?query={query}&page={page}` (P3)
 
 Uses the same query and page validation and pagination response shape as movie search.
+Responses are cached by query and page using HybridCache.
+The default expiration and local-cache expiration are configured under the `HybridCache` section in `appsettings.json` (both default to five minutes). If `HybridCache:DistributedCache:Redis:ConnectionString` is set, Redis is used; if it is missing or blank, the app uses local in-memory caching. Supply the connection string through environment configuration in deployed environments. An unavailable configured Redis server does not automatically trigger a local fallback.
 Each result is a TV series:
 
 ```json
