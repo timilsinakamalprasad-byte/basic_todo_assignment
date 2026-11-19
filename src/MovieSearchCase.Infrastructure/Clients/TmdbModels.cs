@@ -45,3 +45,49 @@ public class TmdbMovie
     [JsonPropertyName("release_date")]
     public string? ReleaseDate { get; init; }
 }
+/// Represents detailed information about a movie, including additional fields
+/// such as runtime, tagline, and genres.
+public class TmdbMovieDetails : TmdbMovie
+{
+    [JsonPropertyName("runtime")]
+    public int? Runtime { get; init; }
+
+    [JsonPropertyName("tagline")]
+    public string? Tagline { get; init; }
+
+    [JsonPropertyName("genres")]
+    public IReadOnlyList<TmdbGenre>? Genres { get; init; }
+}
+/// Represents a genre associated with a movie.
+public class TmdbGenre
+{
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+}
+
+/// <summary>
+/// Represents a video associated with a movie, such as a trailer or teaser.
+/// </summary>
+public class TmdbVideo
+{
+    [JsonPropertyName("key")]
+    public required string Key { get; init; }
+
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+
+    [JsonPropertyName("site")]
+    public required string Site { get; init; }
+
+    [JsonPropertyName("type")]
+    public required string Type { get; init; }
+}
+
+/// <summary>
+/// Represents a paged response containing a list of videos associated with a movie.
+/// </summary>
+public class TmdbVideoPagedResponse
+{
+    [JsonPropertyName("results")]
+    public IReadOnlyList<TmdbVideo>? Results { get; init; }
+}

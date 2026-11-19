@@ -84,4 +84,71 @@ public class TmdbClient : ITmdbClient
             Results = response.Results.Select(TmdbMovieMapper.ToDomainModel).ToList()
         };
     }
+
+    // TODO(candidate): implement TMDB's /movie/{movie_id} endpoint here, following the same try/catch + mapping pattern as GetTrendingMoviesAsync above.
+    // See https://developer.themoviedb.org/reference/movie-details for details on the endpoint.
+    public async Task<MovieDetails> GetMovieDetailsAsync(int id, CancellationToken cancellationToken)
+    {
+        TmdbMovieDetails? response;
+
+        try
+        {
+            response = await _httpClient.GetFromJsonAsync<TmdbMovieDetails>(
+                $"movie/{id}",
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            throw new MovieException(
+                MovieException.ExceptionTitle,
+                ErrorType.UpstreamServiceUnavailable,
+                $"TMDB did not return details for movie ID {id}.");
+        }
+
+        if (response is null)
+        {
+            throw new MovieException(
+                MovieException.ExceptionTitle,
+                ErrorType.EntityNotFound,
+                $"TMDB returned an empty response for movie ID {id}.");
+        }
+
+        return TmdbMovieMapper.ToDetailsDomainModel(response);
+    }
+
+// TODO(candidate): implement TMDB's /movie/{movie_id}/videos endpoint here, following the same try/catch + mapping pattern as GetTrendingMoviesAsync above.
+    // See https://developer.themoviedb.org/reference/movie-videos for details
+    public async Task<IReadOnlyList<MovieVideo>> GetMovieVideosAsync(int id, CancellationToken cancellationToken)
+    {
+        TmdbVideoPagedResponse? response;
+
+        try
+        {
+            response = await _httpClient.GetFromJsonAsync<TmdbVideoPagedResponse>(
+                $"movie/{id}/videos",
+                cancellationToken);
+        }
+        catch (HttpRequestException)
+        {
+            throw new MovieException(   
+                MovieException.ExceptionTitle,
+                ErrorType.UpstreamServiceUnavailable,
+                $"TMDB did not return videos for movie ID {id}.");
+        }
+
+        if (response is null)
+        {
+            throw new MovieException(
+                MovieException.ExceptionTitle,
+                ErrorType.UpstreamServiceUnavailable,
+                $"TMDB returned an empty response for videos of movie ID {id}.");
+        }
+
+         // Only videos with site "YouTube" are considered valid, as per the requirements. Filter out any videos that do not have site "YouTube".
+        return response.Results?
+            .Where(video => video.Site.Equals("YouTube", StringComparison.OrdinalIgnoreCase))
+            .Select(TmdbMovieMapper.ToDomainModel)
+            .ToList() ?? new List<MovieVideo>();
+    }
+    
 }

@@ -19,4 +19,10 @@ public class MovieService : IMovieService
     // TODO(candidate): add a search method here that calls ITmdbClient's new search method.
     public Task<MoviePage> SearchMoviesAsync(string query, int page, CancellationToken cancellationToken) =>
         _tmdbClient.SearchMoviesAsync(query, page, cancellationToken);
+
+    public Task<MovieDetails> GetMovieDetailsAsync(int movieId, CancellationToken cancellationToken) =>
+        _tmdbClient.GetMovieDetailsAsync(movieId, cancellationToken);
+
+    public Task<IReadOnlyList<MovieVideo>> GetMovieVideosAsync(int movieId, CancellationToken cancellationToken) =>
+        _tmdbClient.GetMovieVideosAsync(movieId, cancellationToken);
 }

@@ -77,4 +77,58 @@ public class MovieServiceTests
                 cancellationSource.Token),
             Times.Once);
     }
+
+    [Fact]
+    public async Task GetMovieDetailsAsyncShouldReturnDetailsAndForwardArguments()
+    {
+        var expectedDetails = new MovieDetails
+        {
+            Id = 42,
+            Title = "The Answer",
+            Runtime = 120,
+            Tagline = "A great movie",
+            Genres = ["Science Fiction"],
+        };
+        using var cancellationSource = new CancellationTokenSource();
+        var tmdbClientMock = new Mock<ITmdbClient>();
+        tmdbClientMock
+            .Setup(client => client.GetMovieDetailsAsync(42, cancellationSource.Token))
+            .ReturnsAsync(expectedDetails);
+        var movieService = new MovieService(tmdbClientMock.Object);
+
+        var result = await movieService.GetMovieDetailsAsync(42, cancellationSource.Token);
+
+        result.Should().BeSameAs(expectedDetails);
+        tmdbClientMock.Verify(
+            client => client.GetMovieDetailsAsync(42, cancellationSource.Token),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task GetMovieVideosAsyncShouldReturnVideosAndForwardArguments()
+    {
+        IReadOnlyList<MovieVideo> expectedVideos =
+        [
+            new()
+            {
+                Key = "abc123",
+                Name = "Official Trailer",
+                Site = "YouTube",
+                Type = "Trailer",
+            },
+        ];
+        using var cancellationSource = new CancellationTokenSource();
+        var tmdbClientMock = new Mock<ITmdbClient>();
+        tmdbClientMock
+            .Setup(client => client.GetMovieVideosAsync(42, cancellationSource.Token))
+            .ReturnsAsync(expectedVideos);
+        var movieService = new MovieService(tmdbClientMock.Object);
+
+        var result = await movieService.GetMovieVideosAsync(42, cancellationSource.Token);
+
+        result.Should().BeSameAs(expectedVideos);
+        tmdbClientMock.Verify(
+            client => client.GetMovieVideosAsync(42, cancellationSource.Token),
+            Times.Once);
+    }
 }

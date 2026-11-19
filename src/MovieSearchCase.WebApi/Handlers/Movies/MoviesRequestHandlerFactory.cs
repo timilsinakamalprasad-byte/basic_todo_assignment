@@ -21,4 +21,12 @@ public class MoviesRequestHandlerFactory : IMoviesRequestHandlerFactory
     // added the search handler, then wire it up in MoviesController above.
     public IRequestHandlerAsync SearchMovies(SearchMoviesRequest request) =>
         new SearchMoviesHandler(_movieService, _searchMoviesValidator, request);
+
+    //get movie details by id
+    public IRequestHandlerAsync GetMovieDetails(int movieId) =>
+        new GetMovieDetailsHandler(_movieService, movieId);
+    
+    //get movies trailers by id
+    public IRequestHandlerAsync GetMovieVideos(int movieId) =>
+        new GetMovieVideosHandler(_movieService, movieId);
 }

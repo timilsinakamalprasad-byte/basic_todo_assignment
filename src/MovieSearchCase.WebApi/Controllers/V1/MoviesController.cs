@@ -37,4 +37,20 @@ public class MoviesController : ApiControllerBase
     [SwaggerResponse(StatusCodes.Status503ServiceUnavailable, "TMDB unavailable")]
     public async Task<IActionResult> Search([AsParameters] Models.Movies.SearchMoviesRequest request) =>
         await _requestHandlerFactory.SearchMovies(request).HandleAsync(Request);
+
+    //get movie details by id
+    [HttpGet("{id:int}")]
+    [SwaggerOperation(Summary = "Get movie by ID", OperationId = "GetMovieById")]
+    [SwaggerResponse(StatusCodes.Status200OK, "The requested movie", typeof(Models.Movies.Movie))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Movie not found")]
+    public async Task<IActionResult> Get(int id) =>
+        await _requestHandlerFactory.GetMovieDetails(id).HandleAsync(Request);
+
+    //get movie trailers by movie id
+    [HttpGet("{id:int}/videos")]
+    [SwaggerOperation(Summary = "Get movie videos by ID", OperationId = "GetMovieVideosById")]
+    [SwaggerResponse(StatusCodes.Status200OK, "The requested movie videos", typeof(IEnumerable<Models.Movies.MovieVideo>))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Movie not found")]
+    public async Task<IActionResult> GetVideos(int id) =>
+        await _requestHandlerFactory.GetMovieVideos(id).HandleAsync(Request);
 }

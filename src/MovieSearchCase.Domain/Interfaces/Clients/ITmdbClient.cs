@@ -23,4 +23,20 @@ public interface ITmdbClient
     /// @returns A MoviePage containing the search results.
     /// </summary>
     Task<MoviePage> SearchMoviesAsync(string query, int page, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the details of a movie by its TMDB ID (TMDB's /movie/{movie_id} endpoint).
+    /// @param id The TMDB movie ID.
+    /// @param cancellationToken The cancellation token.
+    /// @returns A MovieDetails object containing the movie's details.
+    /// </summary>
+    Task<MovieDetails> GetMovieDetailsAsync(int id, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Gets the videos (trailers, teasers, etc.) for a movie by its TMDB ID (TMDB's /movie/{movie_id}/videos endpoint).
+    /// @param id The TMDB movie ID.
+    /// @param cancellationToken The cancellation token.
+    /// @returns A list of MovieVideo objects containing the movie's videos.
+    /// </summary>
+    Task<IReadOnlyList<MovieVideo>> GetMovieVideosAsync(int id, CancellationToken cancellationToken);
 }
